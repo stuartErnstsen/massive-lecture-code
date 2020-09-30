@@ -1,32 +1,35 @@
-const caughtPokemon = [];
-let id = 1;
-
 module.exports = {
     getCaughtPokemon: (req, res) => {
-        res.status(200).send(caughtPokemon);
+        const db = req.app.get('db');
+
+        db.get_pokemon()
+        .then(pokemon => res.status(200).send(pokemon))
+        .catch(err => res.status(500).send(err))
     },
     catchPokemon: (req, res) => {
         const {pokemon} = req.body;
+        const db = req.app.get('db');
 
-        pokemon.id = id;
-        id++;
-
-        caughtPokemon.push(pokemon);
-        res.status(200).send(caughtPokemon);
+        db.add_pokemon({name: pokemon.name, image: pokemon.image})
+        .then(pokemon => res.status(200).send(pokemon))
+        .catch(err => res.status(500).send(err))
     },
     editName: (req, res) => {
         const {id} = req.params;
         const {name} = req.body;
+        const db = req.app.get('db');
 
-        const pokemon = caughtPokemon.find(element => element.id === +id);
-        pokemon.name = name;
-        res.status(200).send(caughtPokemon);
+        // db.update_name({name: name, id: id})
+        db.update_name({name, id})
+        .then(pokemon => res.status(200).send(pokemon))
+        .catch(err => res.status(500).send(err))
     },
     releasePokemon: (req, res) => {
         const {id} = req.params;
+        const db = req.app.get('db');
 
-        const index = caughtPokemon.findIndex(element => element.id === +id);
-        caughtPokemon.splice(index, 1);
-        res.status(200).send(caughtPokemon);
+        db.release_pokemon(id)
+        .then(pokemon => res.status(200).send(pokemon))
+        .catch(err => res.status(500).send(err))
     }
 }
